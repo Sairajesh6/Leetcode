@@ -1,24 +1,23 @@
-from typing import List
 class Solution:
     def minimumTeachings(self, n: int, languages: List[List[int]], friendships: List[List[int]]) -> int:
-        need = set()
-        for u, v in friendships:
-            u -= 1
-            v -= 1
-            ok = False
-            for x in languages[u]:
-                if x in languages[v]:
-                    ok = True
-                    break
-            if not ok:
-                need.add(u)
-                need.add(v)
+        learned = list(map(set, languages))
 
-        ans = len(languages) + 1
-        for i in range(1, n + 1):
-            cans = 0
-            for v in need:
-                if i not in languages[v]:
-                    cans += 1
-            ans = min(ans, cans)
-        return ans
+        total = 0
+        vis = [False] * len(languages)
+        cnt = [0] * (n + 1)
+
+        def add(u: int) -> None:
+            if vis[u]:
+                return
+            vis[u] = True  
+            nonlocal total
+            total += 1
+            for x in languages[u]:
+                cnt[x] += 1
+
+        for u, v in friendships:
+            if learned[u - 1].isdisjoint(learned[v - 1]):  
+                add(u - 1)
+                add(v - 1)
+
+        return total - max(cnt)
