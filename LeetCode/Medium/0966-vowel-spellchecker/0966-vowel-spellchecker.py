@@ -1,31 +1,30 @@
+from collections import defaultdict
 class Solution:
-    def spellchecker(self, wordlist, queries):
+    def spellchecker(self, wordlist: List[str], queries: List[str]) -> List[str]:
+        
+        def case_hash(s):
+            return s.lower()
+        
+        def vowel_hash(s):
+            return s.lower().replace('e', 'a').replace('i', 'a').replace('o', 'a').replace('u', 'a')
+        
+        
         exact = set(wordlist)
-        caseMap = {}
-        vowelMap = {}
-
+        case = defaultdict()
+        vowl = defaultdict()
         for w in wordlist:
-            lower = w.lower()
-            devowel = self.deVowel(lower)
-            if lower not in caseMap:
-                caseMap[lower] = w
-            if devowel not in vowelMap:
-                vowelMap[devowel] = w
-
-        result = []
-        for q in queries:
-            if q in exact:
-                result.append(q)
-            else:
-                lower = q.lower()
-                devowel = self.deVowel(lower)
-                if lower in caseMap:
-                    result.append(caseMap[lower])
-                elif devowel in vowelMap:
-                    result.append(vowelMap[devowel])
-                else:
-                    result.append("")
-        return result
-
-    def deVowel(self, s):
-        return ''.join('*' if c in 'aeiou' else c for c in s)
+            c = case_hash(w)
+            if c not in case: case[c] = w
+            v = vowel_hash(w)
+            if v not in vowl: vowl[v] = w
+        
+        def correct(w):
+            if w in exact: return w
+            c = case_hash(w)
+            if c in case: return case[c]
+            v = vowel_hash(w)
+            if v in vowl: return vowl[v]
+            return ''
+                    
+        return [correct(q) for q in queries]
+            
